@@ -55,7 +55,7 @@ frappe.treeview_settings["Account"] = {
 	get_label: function (node) {
 		// clean display name — the account number renders as a badge (see
 		// onrender) instead of being glued into the name
-		return frappe.utils.escape_html(node.data.account_name || node.title || node.label);
+		return frappe.utils.escape_html(__(node.data.account_name || node.title || node.label));
 	},
 	onrender: function (node) {
 		if (node.is_root || !node.data) return;

@@ -34,6 +34,7 @@ class ChartofAccountsImporter(Document):
 		from frappe.types import DF
 
 		company: DF.Link | None
+		copy_account_defaults_from: DF.Link | None
 		import_file: DF.Attach | None
 	# end: auto-generated types
 
@@ -83,11 +84,13 @@ def validate_company(company: str):
 
 
 @frappe.whitelist()
-def import_coa(file_name: str, company: str):
+def import_coa(file_name: str, company: str, copy_account_defaults_from: str | None = None):
 	frappe.only_for("Accounts Manager")
 
 	# delete existing data for accounts
 	frappe.has_permission("Company", "write", company, throw=True)
+	if copy_account_defaults_from:
+		validate_account_defaults_source(company, copy_account_defaults_from)
 
 	# create accounts
 	file_doc, extension = get_file(file_name)
@@ -109,7 +112,8 @@ def import_coa(file_name: str, company: str):
 	create_charts(company, custom_chart=forest, from_coa_importer=True)
 
 	# trigger on_update for company to reset default accounts
-	set_default_accounts(company)
+	mapped_account_defaults = set_default_accounts(company, copy_account_defaults_from)
+	return {"mapped_account_defaults": mapped_account_defaults}
 
 
 def get_file(file_name):
@@ -137,7 +141,7 @@ def generate_data_from_csv(file_doc, as_dict=False):
 	file_path = file_doc.get_full_path()
 
 	data = []
-	with open(file_path) as in_file:
+	with open(file_path, encoding="utf-8-sig") as in_file:
 		csv_reader = list(csv.reader(in_file))
 		headers = csv_reader[0]
 		del csv_reader[0]  # delete top row and headers row
@@ -413,7 +417,15 @@ def validate_accounts(file_doc: Document, extension: str):
 
 
 def validate_root(accounts):
-	roots = [accounts[d] for d in accounts if not accounts[d].get("parent_account")]
+	roots = [
+		account
+		for account in accounts.values()
+		if not account.get("parent_account")
+		or (
+			account.get("parent_account") == account.get("account_name")
+			and account.get("parent_account_number") == account.get("account_number")
+		)
+	]
 	error_messages = []
 
 	for account in roots:
@@ -509,7 +521,90 @@ def validate_user_perms(company):
 		)
 
 
-def set_default_accounts(company):
+def validate_account_defaults_source(company, source_company):
+	if source_company == company:
+		frappe.throw(_("The source company must be different from the target company."))
+
+	if not frappe.db.exists("Company", source_company):
+		frappe.throw(_("Source company {0} does not exist.").format(frappe.bold(source_company)))
+
+	frappe.has_permission("Company", "read", source_company, throw=True)
+
+
+def map_matching_account_defaults(source_defaults, source_accounts, target_accounts):
+	source_accounts_by_name = {account.name: account for account in source_accounts}
+	target_accounts_by_identity = {}
+
+	for account in target_accounts:
+		if account.is_group or not account.account_number:
+			continue
+
+		identity = (
+			cstr(account.account_number).strip(),
+			account.account_type,
+			account.root_type,
+		)
+		target_accounts_by_identity.setdefault(identity, []).append(account.name)
+
+	mappings = {}
+	for fieldname, source_account_name in source_defaults.items():
+		source_account = source_accounts_by_name.get(source_account_name)
+		if not source_account or source_account.is_group or not source_account.account_number:
+			continue
+
+		identity = (
+			cstr(source_account.account_number).strip(),
+			source_account.account_type,
+			source_account.root_type,
+		)
+		target_account_names = target_accounts_by_identity.get(identity, [])
+		if len(target_account_names) == 1:
+			mappings[fieldname] = target_account_names[0]
+
+	return mappings
+
+
+def get_matching_account_defaults(source_company, target_company):
+	account_fields = [
+		field.fieldname
+		for field in frappe.get_meta("Company").get_link_fields()
+		if field.options == "Account"
+	]
+	source_defaults = frappe.db.get_value(
+		"Company", source_company, account_fields, as_dict=True
+	)
+	source_account_names = list({name for name in source_defaults.values() if name})
+	if not source_account_names:
+		return {}
+
+	source_accounts = frappe.get_all(
+		"Account",
+		filters={"company": source_company, "name": ["in", source_account_names]},
+		fields=["name", "account_number", "account_type", "root_type", "is_group"],
+	)
+	account_numbers = list(
+		{
+			cstr(account.account_number).strip()
+			for account in source_accounts
+			if account.account_number and not account.is_group
+		}
+	)
+	if not account_numbers:
+		return {}
+
+	target_accounts = frappe.get_all(
+		"Account",
+		filters={
+			"company": target_company,
+			"account_number": ["in", account_numbers],
+			"is_group": 0,
+		},
+		fields=["name", "account_number", "account_type", "root_type", "is_group"],
+	)
+	return map_matching_account_defaults(source_defaults, source_accounts, target_accounts)
+
+
+def set_default_accounts(company, copy_account_defaults_from=None):
 	from erpnext.setup.doctype.company.company import install_country_fixtures
 
 	company = frappe.get_doc("Company", company)
@@ -527,7 +622,12 @@ def set_default_accounts(company):
 			),
 		}
 	)
+	mapped_account_defaults = {}
+	if copy_account_defaults_from:
+		mapped_account_defaults = get_matching_account_defaults(copy_account_defaults_from, company.name)
+		company.update(mapped_account_defaults)
 
 	company.save()
 	install_country_fixtures(company.name, company.country)
 	company.create_default_tax_template()
+	return len(mapped_account_defaults)

@@ -1,6 +1,7 @@
 frappe.ui.form.on("Chart of Accounts Importer", {
 	onload: function (frm) {
 		frm.set_value("company", "");
+		frm.set_value("copy_account_defaults_from", "");
 		frm.set_value("import_file", "");
 	},
 	refresh: function (frm) {
@@ -125,12 +126,21 @@ var create_import_button = function (frm) {
 				args: {
 					file_name: frm.doc.import_file,
 					company: frm.doc.company,
+					copy_account_defaults_from: frm.doc.copy_account_defaults_from,
 				},
 				freeze: true,
 				freeze_message: __("Creating Accounts..."),
 				callback: function (r) {
 					if (!r.exc) {
 						frm.page.set_indicator(__("Import Successful"), "blue");
+						if (frm.doc.copy_account_defaults_from) {
+							frappe.show_alert({
+								message: __("{0} account defaults copied by matching account number.", [
+									r.message?.mapped_account_defaults || 0,
+								]),
+								indicator: "green",
+							});
+						}
 						create_reset_button(frm);
 					}
 				},

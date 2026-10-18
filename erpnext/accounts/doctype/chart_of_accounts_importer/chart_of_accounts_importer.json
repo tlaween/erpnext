@@ -9,6 +9,7 @@
  "engine": "InnoDB",
  "field_order": [
   "company",
+  "copy_account_defaults_from",
   "download_template",
   "import_file",
   "chart_preview",
@@ -20,6 +21,14 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Company",
+   "options": "Company"
+  },
+  {
+   "depends_on": "company",
+   "description": "Copy company account defaults only when an account with the same number, type, and root exists uniquely in the target company.",
+   "fieldname": "copy_account_defaults_from",
+   "fieldtype": "Link",
+   "label": "Copy Account Defaults From",
    "options": "Company"
   },
   {

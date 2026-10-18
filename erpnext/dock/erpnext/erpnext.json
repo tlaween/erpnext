@@ -6,7 +6,7 @@
  "idx": 0,
  "items": [
   {
-   "added": 0,
+   "added": 1,
    "hidden": 0,
    "icon": "landmark",
    "link_to": "Accounts",
@@ -14,15 +14,7 @@
    "title": "Accounts"
   },
   {
-   "added": 0,
-   "hidden": 0,
-   "icon": "handshake",
-   "link_to": "CRM",
-   "link_type": "Sidebar",
-   "title": "CRM"
-  },
-  {
-   "added": 0,
+   "added": 1,
    "hidden": 0,
    "icon": "shopping-cart",
    "link_to": "Buying",
@@ -30,15 +22,7 @@
    "title": "Buying"
   },
   {
-   "added": 0,
-   "hidden": 0,
-   "icon": "folder-kanban",
-   "link_to": "Projects",
-   "link_type": "Sidebar",
-   "title": "Projects"
-  },
-  {
-   "added": 0,
+   "added": 1,
    "hidden": 0,
    "icon": "store",
    "link_to": "Selling",
@@ -46,23 +30,7 @@
    "title": "Selling"
   },
   {
-   "added": 0,
-   "hidden": 0,
-   "icon": "sliders-horizontal",
-   "link_to": "Setup",
-   "link_type": "Sidebar",
-   "title": "Setup"
-  },
-  {
-   "added": 0,
-   "hidden": 0,
-   "icon": "building-2",
-   "link_to": "Manufacturing",
-   "link_type": "Sidebar",
-   "title": "Manufacturing"
-  },
-  {
-   "added": 0,
+   "added": 1,
    "hidden": 0,
    "icon": "package",
    "link_to": "Stock",
@@ -70,80 +38,96 @@
    "title": "Stock"
   },
   {
-   "added": 0,
+   "added": 1,
    "hidden": 0,
+   "icon": "sliders-horizontal",
+   "link_to": "Setup",
+   "link_type": "Sidebar",
+   "title": "Setup"
+  },
+  {
+   "added": 1,
+   "hidden": 1,
+   "icon": "folder-kanban",
+   "link_to": "Projects",
+   "link_type": "Sidebar",
+   "title": "Projects"
+  },
+  {
+   "added": 1,
+   "hidden": 1,
+   "icon": "building-2",
+   "link_to": "Manufacturing",
+   "link_type": "Sidebar",
+   "title": "Manufacturing"
+  },
+  {
+   "added": 1,
+   "hidden": 1,
    "icon": "headset",
    "link_to": "Support",
    "link_type": "Sidebar",
    "title": "Support"
   },
   {
-   "added": 0,
-   "hidden": 0,
+   "added": 1,
+   "hidden": 1,
    "icon": "pocket-knife",
    "link_to": "Utilities",
    "link_type": "Sidebar",
    "title": "Utilities"
   },
   {
-   "added": 0,
-   "hidden": 0,
+   "added": 1,
+   "hidden": 1,
    "icon": "archive",
    "link_to": "Assets",
    "link_type": "Sidebar",
    "title": "Assets"
   },
   {
-   "added": 0,
-   "hidden": 0,
-   "icon": "panels-top-left",
-   "link_to": "Portal",
-   "link_type": "Sidebar",
-   "title": "Portal"
-  },
-  {
-   "added": 0,
-   "hidden": 0,
+   "added": 1,
+   "hidden": 1,
    "icon": "wrench",
    "link_to": "Maintenance",
    "link_type": "Sidebar",
    "title": "Maintenance"
   },
   {
-   "added": 0,
-   "hidden": 0,
+   "added": 1,
+   "hidden": 1,
    "icon": "globe",
    "link_to": "Regional",
    "link_type": "Sidebar",
    "title": "Regional"
   },
   {
-   "added": 0,
-   "hidden": 0,
+   "added": 1,
+   "hidden": 1,
    "icon": "plug",
    "link_to": "ERPNext Integrations",
    "link_type": "Sidebar",
    "title": "Integrations"
   },
   {
-   "added": 0,
-   "hidden": 0,
+   "added": 1,
+   "hidden": 1,
    "icon": "shield-check",
    "link_to": "Quality",
    "link_type": "Sidebar",
    "title": "Quality"
   },
   {
-   "added": 0,
-   "hidden": 0,
+   "added": 1,
+   "hidden": 1,
    "icon": "factory",
    "link_to": "Subcontracting",
    "link_type": "Sidebar",
    "title": "Subcontracting"
   }
  ],
- "modified": "2026-09-02 14:58:17.082794",
- "modified_by": "Administrator",
+ "modified": "2026-10-14 03:32:10.884170",
+ "modified_by": "yuosf2695@gmail.com",
  "name": "erpnext",
  "owner": "Administrator",
  "standard": 1,
